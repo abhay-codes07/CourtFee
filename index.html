@@ -108,8 +108,22 @@
             text-align: center;
             color: #777;
             font-size: 0.9rem;
-            line-height: 1.5;
+            line-height: 1.6;
         }
+
+        .designer-name {
+            font-weight: 600; /* Bolder font */
+            font-size: 1.1em;   /* Slightly larger size */
+            color: #444;       /* Darker text for emphasis */
+            margin: 0;
+        }
+
+        .designer-title {
+            font-size: 0.95em; /* Smaller than the name */
+            color: #888;
+            margin: 0;
+        }
+
 
         /* Responsive adjustments */
         @media (max-width: 600px) {
@@ -128,7 +142,7 @@
 <body>
 
     <div class="container">
-        <h1>Calculate the 'ad valorem' court fee for VC</h1>
+        <h1>Calculate the 'ad valorem' court fee for UP</h1>
         <div class="input-group">
             <label for="amount">Enter Amount (in Rs.)</label>
             <input type="number" id="amount" placeholder="e.g., 18" step="any" min="0" onkeydown="if(event.key==='Enter') calculateFee()">
@@ -140,8 +154,8 @@
     </div>
 
     <footer>
-        Designed by Ankit Kumar<br>
-        CJ(JD)
+        <p class="designer-name">Designed by Ankit Kumar</p>
+        <p class="designer-title">Uttar Pradesh Nyayik Seva</p>
     </footer>
 
     <script>
