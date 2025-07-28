@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fee Calculator</title>
+    <style>
+        /* Basic Styling */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f4f7f6;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Main container for the calculator */
+        .container {
+            background-color: #ffffff;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 500px;
+            box-sizing: border-box;
+        }
+
+        /* Header styling */
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        /* Input field and button styling */
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+
+        #amount {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #dcdcdc;
+            border-radius: 4px;
+            font-size: 1rem;
+            box-sizing: border-box;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 1rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #2980b9;
+        }
+
+        /* Result display styling */
+        .result {
+            margin-top: 2rem;
+            padding: 1rem;
+            background-color: #eaf6ff;
+            border-left: 5px solid #3498db;
+            border-radius: 4px;
+        }
+
+        #output {
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #2c3e50;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Proper Fee Calculator</h1>
+        <div class="input-group">
+            <label for="amount">Enter Amount (in Rs.)</label>
+            <input type="number" id="amount" placeholder="e.g., 18" step="any" min="0">
+        </div>
+        <button onclick="calculateFee()">Calculate Fee</button>
+        <div class="result">
+            <p id="output">Your fee will be displayed here.</p>
+        </div>
+    </div>
+
+    <script>
+        const feeSchedule = [
+            { exceeds: 0, notExceeds: 5, fee: 0.50 },
+            { exceeds: 5, notExceeds: 10, fee: 1.00 },
+            { exceeds: 10, notExceeds: 15, fee: 1.50 },
+            { exceeds: 15, notExceeds: 20, fee: 2.00 },
+            { exceeds: 20, notExceeds: 25, fee: 2.50 },
+            { exceeds: 25, notExceeds: 30, fee: 3.00 },
+            { exceeds: 30, notExceeds: 35, fee: 3.50 },
+            { exceeds: 35, notExceeds: 40, fee: 4.00 },
+            { exceeds: 40, notExceeds: 45, fee: 4.50 },
+            { exceeds: 45, notExceeds: 50, fee: 5.00 },
+            { exceeds: 50, notExceeds: 55, fee: 5.50 },
+            { exceeds: 55, notExceeds: 60, fee: 6.00 },
+            { exceeds: 60, notExceeds: 65, fee: 6.50 },
+            { exceeds: 65, notExceeds: 70, fee: 7.00 },
+            { exceeds: 70, notExceeds: 75, fee: 7.50 },
+            { exceeds: 75, notExceeds: 80, fee: 8.00 },
+            { exceeds: 80, notExceeds: 85, fee: 8.50 },
+            { exceeds: 85, notExceeds: 90, fee: 9.00 },
+            { exceeds: 90, notExceeds: 95, fee: 9.50 },
+            { exceeds: 95, notExceeds: 100, fee: 10.00 },
+            { exceeds: 100, notExceeds: 110, fee: 11.25 },
+            { exceeds: 110, notExceeds: 120, fee: 12.50 },
+            { exceeds: 120, notExceeds: 130, fee: 13.75 },
+            { exceeds: 130, notExceeds: 140, fee: 15.00 },
+            { exceeds: 140, notExceeds: 150, fee: 16.25 },
+            { exceeds: 150, notExceeds: 160, fee: 17.50 },
+            { exceeds: 160, notExceeds: 170, fee: 18.75 },
+            { exceeds: 170, notExceeds: 180, fee: 20.00 },
+            { exceeds: 180, notExceeds: 190, fee: 21.25 },
+            { exceeds: 190, notExceeds: 200, fee: 22.50 },
+            { exceeds: 200, notExceeds: 210, fee: 23.75 },
+            { exceeds: 210, notExceeds: 220, fee: 25.00 },
+            { exceeds: 220, notExceeds: 230, fee: 26.25 },
+            { exceeds: 230, notExceeds: 240, fee: 27.50 },
+            { exceeds: 240, notExceeds: 250, fee: 28.75 },
+            { exceeds: 250, notExceeds: 260, fee: 30.00 },
+            { exceeds: 260, notExceeds: 270, fee: 31.25 },
+            { exceeds: 270, notExceeds: 280, fee: 32.50 },
+            { exceeds: 280, notExceeds: 290, fee: 33.75 },
+            { exceeds: 290, notExceeds: 300, fee: 35.00 },
+            { exceeds: 300, notExceeds: 310, fee: 36.50 },
+            { exceeds: 310, notExceeds: 320, fee: 38.00 },
+            { exceeds: 320, notExceeds: 330, fee: 39.50 },
+            { exceeds: 330, notExceeds: 340, fee: 41.00 },
+            { exceeds: 340, notExceeds: 350, fee: 42.50 },
+            { exceeds: 350, notExceeds: 360, fee: 44.00 },
+            { exceeds: 360, notExceeds: 370, fee: 45.50 },
+            { exceeds: 370, notExceeds: 380, fee: 47.00 },
+            { exceeds: 380, notExceeds: 390, fee: 48.50 },
+            { exceeds: 390, notExceeds: 400, fee: 50.00 },
+            { exceeds: 400, notExceeds: 410, fee: 51.50 },
+            { exceeds: 410, notExceeds: 420, fee: 53.00 },
+            { exceeds: 420, notExceeds: 430, fee: 54.50 },
+            { exceeds: 430, notExceeds: 440, fee: 56.00 },
+            { exceeds: 440, notExceeds: 450, fee: 57.50 },
+            { exceeds: 450, notExceeds: 460, fee: 59.00 },
+            { exceeds: 460, notExceeds: 470, fee: 60.50 },
+            { exceeds: 470, notExceeds: 480, fee: 62.00 },
+            { exceeds: 480, notExceeds: 490, fee: 63.50 },
+            { exceeds: 490, notExceeds: 500, fee: 65.00 },
+            { exceeds: 500, notExceeds: 510, fee: 67.25 },
+            { exceeds: 510, notExceeds: 520, fee: 69.50 },
+            { exceeds: 520, notExceeds: 530, fee: 71.75 },
+            { exceeds: 530, notExceeds: 540, fee: 74.00 },
+            { exceeds: 540, notExceeds: 550, fee: 76.25 },
+            { exceeds: 550, notExceeds: 560, fee: 78.50 },
+            { exceeds: 560, notExceeds: 570, fee: 80.75 },
+            { exceeds: 570, notExceeds: 580, fee: 83.00 },
+            { exceeds: 580, notExceeds: 590, fee: 85.25 },
+            { exceeds: 590, notExceeds: 600, fee: 87.50 },
+            { exceeds: 600, notExceeds: 610, fee: 89.75 },
+            { exceeds: 610, notExceeds: 620, fee: 92.00 },
+            { exceeds: 620, notExceeds: 630, fee: 94.25 },
+            { exceeds: 630, notExceeds: 640, fee: 96.50 },
+            { exceeds: 640, notExceeds: 650, fee: 98.75 },
+            { exceeds: 650, notExceeds: 660, fee: 101.00 },
+            { exceeds: 660, notExceeds: 670, fee: 103.25 },
+            { exceeds: 670, notExceeds: 680, fee: 105.50 },
+            { exceeds: 680, notExceeds: 690, fee: 107.75 },
+            { exceeds: 690, notExceeds: 700, fee: 110.00 },
+            { exceeds: 700, notExceeds: 710, fee: 112.25 },
+            { exceeds: 710, notExceeds: 720, fee: 114.50 },
+            { exceeds: 720, notExceeds: 730, fee: 116.75 },
+            { exceeds: 730, notExceeds: 740, fee: 119.00 },
+            { exceeds: 740, notExceeds: 750, fee: 121.25 },
+            { exceeds: 750, notExceeds: 760, fee: 123.50 },
+            { exceeds: 760, notExceeds: 770, fee: 125.75 },
+            { exceeds: 770, notExceeds: 780, fee: 128.00 },
+            { exceeds: 780, notExceeds: 790, fee: 130.25 },
+            { exceeds: 790, notExceeds: 800, fee: 132.50 },
+            { exceeds: 800, notExceeds: 810, fee: 134.75 },
+            { exceeds: 810, notExceeds: 820, fee: 137.00 },
+            { exceeds: 820, notExceeds: 830, fee: 139.25 },
+            { exceeds: 830, notExceeds: 840, fee: 141.50 },
+            { exceeds: 840, notExceeds: 850, fee: 143.75 },
+            { exceeds: 850, notExceeds: 860, fee: 146.00 },
+            { exceeds: 860, notExceeds: 870, fee: 148.25 },
+            { exceeds: 870, notExceeds: 880, fee: 150.50 },
+            { exceeds: 880, notExceeds: 890, fee: 152.75 },
+            { exceeds: 890, notExceeds: 900, fee: 155.00 },
+            { exceeds: 900, notExceeds: 910, fee: 157.25 },
+            { exceeds: 910, notExceeds: 920, fee: 159.50 },
+            { exceeds: 920, notExceeds: 930, fee: 161.75 },
+            { exceeds: 930, notExceeds: 940, fee: 164.00 },
+            { exceeds: 940, notExceeds: 950, fee: 166.25 },
+            { exceeds: 950, notExceeds: 960, fee: 168.50 },
+            { exceeds: 960, notExceeds: 970, fee: 170.75 },
+            { exceeds: 970, notExceeds: 980, fee: 173.00 },
+            { exceeds: 980, notExceeds: 990, fee: 175.25 },
+            { exceeds: 990, notExceeds: 1000, fee: 177.50 },
+            { exceeds: 1000, notExceeds: 1100, fee: 189.50 },
+            { exceeds: 1100, notExceeds: 1200, fee: 201.50 },
+            { exceeds: 1200, notExceeds: 1300, fee: 213.50 },
+            { exceeds: 1300, notExceeds: 1400, fee: 225.50 },
+            { exceeds: 1400, notExceeds: 1500, fee: 237.50 },
+            { exceeds: 1500, notExceeds: 1600, fee: 249.50 },
+            { exceeds: 1600, notExceeds: 1700, fee: 261.50 },
+            { exceeds: 1700, notExceeds: 1800, fee: 273.50 },
+            { exceeds: 1800, notExceeds: 1900, fee: 285.50 },
+            { exceeds: 1900, notExceeds: 2000, fee: 297.50 },
+            { exceeds: 2000, notExceeds: 2100, fee: 309.50 },
+            { exceeds: 2100, notExceeds: 2200, fee: 321.50 },
+            { exceeds: 2200, notExceeds: 2300, fee: 333.50 },
+            { exceeds: 2300, notExceeds: 2400, fee: 345.50 },
+            { exceeds: 2400, notExceeds: 2500, fee: 357.50 },
+            { exceeds: 2500, notExceeds: 2600, fee: 369.00 },
+            { exceeds: 2600, notExceeds: 2700, fee: 381.50 },
+            { exceeds: 2700, notExceeds: 2800, fee: 393.50 },
+            { exceeds: 2800, notExceeds: 2900, fee: 405.50 },
+            { exceeds: 2900, notExceeds: 3000, fee: 417.50 },
+            { exceeds: 3000, notExceeds: 3100, fee: 429.50 },
+            { exceeds: 3100, notExceeds: 3200, fee: 441.50 },
+            { exceeds: 3200, notExceeds: 3300, fee: 453.50 },
+            { exceeds: 3300, notExceeds: 3400, fee: 465.50 },
+            { exceeds: 3400, notExceeds: 3500, fee: 477.50 },
+            { exceeds: 3500, notExceeds: 3600, fee: 489.50 },
+            { exceeds: 3600, notExceeds: 3700, fee: 501.50 },
+            { exceeds: 3700, notExceeds: 3800, fee: 513.50 },
+            { exceeds: 3800, notExceeds: 3900, fee: 525.50 },
+            { exceeds: 3900, notExceeds: 4000, fee: 537.50 },
+            { exceeds: 4000, notExceeds: 4100, fee: 549.50 },
+            { exceeds: 4100, notExceeds: 4200, fee: 561.50 },
+            { exceeds: 4200, notExceeds: 4300, fee: 573.50 },
+            { exceeds: 4300, notExceeds: 4400, fee: 585.50 },
+            { exceeds: 4400, notExceeds: 4500, fee: 597.50 },
+            { exceeds: 4500, notExceeds: 4600, fee: 609.50 },
+            { exceeds: 4600, notExceeds: 4700, fee: 621.50 },
+            { exceeds: 4700, notExceeds: 4800, fee: 633.50 },
+            { exceeds: 4800, notExceeds: 4900, fee: 645.50 },
+            { exceeds: 4900, notExceeds: 5000, fee: 657.50 },
+            { exceeds: 5000, notExceeds: 5200, fee: 677.50 },
+            { exceeds: 5200, notExceeds: 5400, fee: 697.50 },
+            { exceeds: 5400, notExceeds: 5600, fee: 717.50 },
+            { exceeds: 5600, notExceeds: 5800, fee: 737.50 },
+            { exceeds: 5800, notExceeds: 6000, fee: 757.50 },
+            { exceeds: 6000, notExceeds: 6200, fee: 777.50 },
+            { exceeds: 6200, notExceeds: 6400, fee: 797.50 },
+            { exceeds: 6400, notExceeds: 6600, fee: 817.50 },
+            { exceeds: 6600, notExceeds: 6800, fee: 837.50 },
+            { exceeds: 6800, notExceeds: 7000, fee: 857.50 },
+            { exceeds: 7000, notExceeds: 7200, fee: 877.50 },
+            { exceeds: 7200, notExceeds: 7400, fee: 897.50 },
+            { exceeds: 7400, notExceeds: 7600, fee: 917.50 },
+            { exceeds: 7600, notExceeds: 7800, fee: 937.50 },
+            { exceeds: 7800, notExceeds: 8000, fee: 957.50 },
+            { exceeds: 8000, notExceeds: 8200, fee: 977.50 },
+            { exceeds: 8200, notExceeds: 8400, fee: 997.50 },
+            { exceeds: 8400, notExceeds: 8600, fee: 1017.50 },
+            { exceeds: 8600, notExceeds: 8800, fee: 1037.50 },
+            { exceeds: 8800, notExceeds: 9000, fee: 1057.50 },
+            { exceeds: 9000, notExceeds: 9200, fee: 1077.50 },
+            { exceeds: 9200, notExceeds: 9400, fee: 1097.50 },
+            { exceeds: 9400, notExceeds: 9600, fee: 1117.50 },
+            { exceeds: 9600, notExceeds: 9800, fee: 1137.50 },
+            { exceeds: 9800, notExceeds: 10000, fee: 1157.50 },
+            { exceeds: 10000, notExceeds: 10500, fee: 1195.00 },
+            { exceeds: 10500, notExceeds: 11000, fee: 1232.50 },
+            { exceeds: 11000, notExceeds: 11500, fee: 1270.00 },
+            { exceeds: 11500, notExceeds: 12000, fee: 1307.50 },
+            { exceeds: 12000, notExceeds: 12500, fee: 1345.00 },
+            { exceeds: 12500, notExceeds: 13000, fee: 1382.50 },
+            { exceeds: 13000, notExceeds: 13500, fee: 1420.00 },
+            { exceeds: 13500, notExceeds: 14000, fee: 1457.50 },
+            { exceeds: 14000, notExceeds: 14500, fee: 1495.00 },
+            { exceeds: 14500, notExceeds: 15000, fee: 1532.50 },
+            { exceeds: 15000, notExceeds: 15500, fee: 1570.00 },
+            { exceeds: 15500, notExceeds: 16000, fee: 1607.50 },
+            { exceeds: 16000, notExceeds: 16500, fee: 1645.00 },
+            { exceeds: 16500, notExceeds: 17000, fee: 1682.50 },
+            { exceeds: 17000, notExceeds: 17500, fee: 1720.00 },
+            { exceeds: 17500, notExceeds: 18000, fee: 1757.50 },
+            { exceeds: 18000, notExceeds: 18500, fee: 1795.00 },
+            { exceeds: 18500, notExceeds: 19000, fee: 1832.50 },
+            { exceeds: 19000, notExceeds: 19500, fee: 1870.00 },
+            { exceeds: 19500, notExceeds: 20000, fee: 1907.50 },
+            { exceeds: 20000, notExceeds: 20500, fee: 1945.00 },
+            { exceeds: 20500, notExceeds: 21000, fee: 1982.50 },
+            { exceeds: 21000, notExceeds: 21500, fee: 2020.00 },
+            { exceeds: 21500, notExceeds: 22000, fee: 2057.50 },
+            { exceeds: 22000, notExceeds: 22500, fee: 2095.00 },
+            { exceeds: 22500, notExceeds: 23000, fee: 2132.50 },
+            { exceeds: 23000, notExceeds: 23500, fee: 2180.00 },
+            { exceeds: 23500, notExceeds: 24000, fee: 2207.50 },
+            { exceeds: 24000, notExceeds: 24500, fee: 2245.00 },
+            { exceeds: 24500, notExceeds: 25000, fee: 2282.50 },
+            { exceeds: 25000, notExceeds: 25500, fee: 2320.00 },
+            { exceeds: 25500, notExceeds: 26000, fee: 2357.50 },
+            { exceeds: 26000, notExceeds: 26500, fee: 2395.00 },
+            { exceeds: 26500, notExceeds: 27000, fee: 2432.50 },
+            { exceeds: 27000, notExceeds: 27500, fee: 2470.00 },
+            { exceeds: 27500, notExceeds: 28000, fee: 2507.50 },
+            { exceeds: 28000, notExceeds: 28500, fee: 2545.00 },
+            { exceeds: 28500, notExceeds: 29000, fee: 2582.50 },
+            { exceeds: 29000, notExceeds: 29500, fee: 2620.00 },
+            { exceeds: 29500, notExceeds: 30000, fee: 2657.50 }
+        ];
+
+        function calculateFee() {
+            const amountInput = document.getElementById('amount');
+            const output = document.getElementById('output');
+            const amount = parseFloat(amountInput.value);
+
+            if (isNaN(amount) || amount < 0) {
+                output.textContent = 'Please enter a valid positive amount.';
+                return;
+            }
+
+            let fee = 0;
+
+            if (amount > 30000) {
+                fee = 2657.50 + ((amount - 30000) * 37.5) / 500;
+            } else if (amount > 0 && amount <= 5) {
+                // Special handling for the first two rows which seem to have a different logic.
+                // For a value between 1 and 5 (inclusive of 5), the fee is Rs. 0.50
+                // Based on the provided image, it looks like a value of up to 5 has a fee of 0.50.
+                fee = 0.50;
+            } else {
+                // Find the fee from the schedule for amounts up to 30,000
+                for (const range of feeSchedule) {
+                    if (amount > range.exceeds && amount <= range.notExceeds) {
+                        fee = range.fee;
+                        break;
+                    }
+                }
+            }
+
+            output.textContent = `Proper Fee: Rs. ${fee.toFixed(2)}`;
+        }
+    </script>
+
+</body>
+</html>
