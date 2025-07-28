@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Fee Calculator</title>
+    <title>Ad Valorem Court Fee Calculator</title>
     <style>
         /* Basic Styling */
         body {
@@ -13,6 +13,7 @@
             background-color: #f4f7f6;
             color: #333;
             display: flex;
+            flex-direction: column; /* Align container and footer vertically */
             justify-content: center;
             align-items: center;
             min-height: 100vh;
@@ -22,81 +23,115 @@
         .container {
             background-color: #ffffff;
             padding: 2rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 500px;
             box-sizing: border-box;
+            text-align: center; /* Center align content inside container */
         }
 
         /* Header styling */
         h1 {
             color: #2c3e50;
             text-align: center;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            font-size: 1.5rem; /* Adjusted for mobile */
         }
 
         /* Input field and button styling */
         .input-group {
-            margin-bottom: 1rem;
+            margin-bottom: 1.5rem;
+            text-align: left; /* Keep labels left-aligned */
         }
 
         label {
             display: block;
             margin-bottom: 0.5rem;
             font-weight: 500;
+            color: #555;
         }
 
         #amount {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             border: 1px solid #dcdcdc;
-            border-radius: 4px;
-            font-size: 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
             box-sizing: border-box;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        #amount:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.5);
         }
 
         button {
             width: 100%;
-            padding: 12px;
+            padding: 14px;
             background-color: #3498db;
             color: white;
             border: none;
-            border-radius: 4px;
-            font-size: 1rem;
+            border-radius: 8px;
+            font-size: 1.1rem;
             font-weight: bold;
             cursor: pointer;
-            transition: background-color 0.3s ease;
+            transition: background-color 0.3s ease, transform 0.2s ease;
         }
 
         button:hover {
             background-color: #2980b9;
+            transform: translateY(-2px);
         }
 
         /* Result display styling */
         .result {
             margin-top: 2rem;
-            padding: 1rem;
+            padding: 1.2rem;
             background-color: #eaf6ff;
             border-left: 5px solid #3498db;
             border-radius: 4px;
+            text-align: center;
         }
 
         #output {
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             font-weight: bold;
             color: #2c3e50;
+        }
+
+        /* Footer styling for the design credit */
+        footer {
+            margin-top: 2.5rem;
             text-align: center;
+            color: #777;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 600px) {
+            body {
+                padding: 15px;
+            }
+            .container {
+                padding: 1.5rem;
+            }
+            h1 {
+                font-size: 1.3rem;
+            }
         }
     </style>
 </head>
 <body>
 
     <div class="container">
-        <h1>Proper Fee Calculator</h1>
+        <h1>Calculate the 'ad valorem' court fee for VC</h1>
         <div class="input-group">
             <label for="amount">Enter Amount (in Rs.)</label>
-            <input type="number" id="amount" placeholder="e.g., 18" step="any" min="0">
+            <input type="number" id="amount" placeholder="e.g., 18" step="any" min="0" onkeydown="if(event.key==='Enter') calculateFee()">
         </div>
         <button onclick="calculateFee()">Calculate Fee</button>
         <div class="result">
@@ -104,7 +139,13 @@
         </div>
     </div>
 
+    <footer>
+        Designed by Ankit Kumar<br>
+        CJ(JD)
+    </footer>
+
     <script>
+        // --- LOGIC REMAINS UNCHANGED ---
         const feeSchedule = [
             { exceeds: 0, notExceeds: 5, fee: 0.50 },
             { exceeds: 5, notExceeds: 10, fee: 1.00 },
@@ -332,16 +373,17 @@
                 output.textContent = 'Please enter a valid positive amount.';
                 return;
             }
+            
+            // Handle the case where the amount is exactly 0
+            if (amount === 0) {
+                output.textContent = `Proper Fee: Rs. 0.00`;
+                return;
+            }
 
             let fee = 0;
 
             if (amount > 30000) {
                 fee = 2657.50 + ((amount - 30000) * 37.5) / 500;
-            } else if (amount > 0 && amount <= 5) {
-                // Special handling for the first two rows which seem to have a different logic.
-                // For a value between 1 and 5 (inclusive of 5), the fee is Rs. 0.50
-                // Based on the provided image, it looks like a value of up to 5 has a fee of 0.50.
-                fee = 0.50;
             } else {
                 // Find the fee from the schedule for amounts up to 30,000
                 for (const range of feeSchedule) {
